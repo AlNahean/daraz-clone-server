@@ -10,6 +10,7 @@ const connectDb = require("./db/connect");
 const productRouter = require("./router/product");
 const testRouter = require("./router/test");
 const searchRouter = require("./router/search");
+const { imageStream } = require("./middleware/file-upload");
 const app = express();
 
 app.use(express.json({ limit: "5000kb", extended: true })); //helps doing json
@@ -28,6 +29,7 @@ app.use("/test", testRouter);
 app.use("/user", userRouter);
 app.use("/product", productRouter);
 app.use("/search", searchRouter);
+app.use("/imageStream", imageStream);
 app.get("/", (req, res) => {
   res.send("Welcome to My Api");
 });

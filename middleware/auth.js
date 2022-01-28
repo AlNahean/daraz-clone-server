@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const auth = async (req, res, next) => {
   try {
     const Token = req.headers.authorization?.split(" ")[1];
-    console.log(Token);
+    // console.log(Token);
     let decodedData;
 
     decodedData = await jwt.verify(Token, "secret");

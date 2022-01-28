@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-const fileUpload = require("../middleware/file-upload");
+const { fileUpload } = require("../middleware/file-upload");
 const auth = require("../middleware/auth");
 const Test = require("../models/test");
 

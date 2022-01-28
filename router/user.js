@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const UserInfo = require("../models/user");
 const auth = require("../middleware/auth");
-const fileUpload = require("../middleware/file-upload");
+const { fileUpload, deleteImage } = require("../middleware/file-upload");
 const baseUrl = require("../baseUrl");
 let fs = require("fs");
 
@@ -25,20 +25,22 @@ router.patch("/:id", auth, fileUpload.single("image"), async (req, res) => {
     );
     const updatedUser = await UserInfo.findByIdAndUpdate(
       id,
-      { img: `${baseUrl}${req.file.path}`, org: req.file.path },
+      { img: `${baseUrl}imageStream/${req.file.path}`, org: req.file.id },
       {
         new: true,
         runValidators: true,
       }
     );
 
-    if (fs.existsSync(userInfoCached.org)) {
-      await fs.unlink(userInfoCached.org, function (err) {
-        if (err) throw err;
-        console.log("File deleted!");
-      });
-    }
-    res.json({ ...req.body, img: `${baseUrl}${req.file.path}` });
+    await deleteImage(userInfoCached.org);
+
+    // if (fs.existsSync(userInfoCached.org)) {
+    //   await fs.unlink(userInfoCached.org, function (err) {
+    //     if (err) throw err;
+    //     console.log("File deleted!");
+    //   });
+    // }
+    res.json({ ...req.body, img: `${baseUrl}${req.file.id}` });
   } catch (error) {
     console.log(error);
     res.json({ type: "F", msg: "server error" });
@@ -74,7 +76,7 @@ router.post("/signup", async (req, res) => {
       name: result.name,
       id: result._id,
       token,
-      tokenExp: new Date().getTime() + 3600000,
+      tokenExp: new Date().getTime() + 36000000000,
     });
   } catch (error) {
     console.log(error);
@@ -108,7 +110,7 @@ router.post("/signin", async (req, res) => {
       name: oldUser.name,
       id: oldUser._id,
       token,
-      tokenExp: new Date().getTime() + 3600000,
+      tokenExp: new Date().getTime() + 36000000000,
       img: oldUser.img,
     });
     // res

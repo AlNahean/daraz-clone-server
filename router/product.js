@@ -4,7 +4,7 @@ let fs = require("fs");
 const auth = require("../middleware/auth");
 const ProductInfo = require("../models/product");
 const UserInfo = require("../models/user");
-const fileUpload = require("../middleware/file-upload");
+const { fileUpload, deleteImage } = require("../middleware/file-upload");
 const baseUrl = require("../baseUrl");
 
 const router = express.Router();
@@ -12,24 +12,25 @@ const router = express.Router();
 //w
 router.get("/:type", async (req, res) => {
   try {
-    console.log(req.params.type);
-    console.log(req.query);
+    // console.log(req.params.type);
+    // console.log(req.query);
 
     if (req.params.type === "single") {
       const post = await ProductInfo.findById(req.query.id);
       res.json({ msg: "success", post });
     } else if (req.params.type === "userProducts") {
-      console.log(req.query);
+      // console.log(req.query);
       const post = await ProductInfo.find({
         uploaderId: req.query.id,
       })
         .limit(parseInt(req.query.limit))
-        .skip(parseInt(req.query.skip));
+        .skip(parseInt(req.query.skip))
+        .sort({ uploadTimeSort: -1 });
 
       const postsArrayLength = await ProductInfo.countDocuments({
         uploaderId: req.query.id,
       });
-      console.log(post);
+      // console.log(post);
       res.json({ msg: "success", posts: post, postsArrayLength });
     } else {
       const post = await ProductInfo.find({
@@ -39,7 +40,10 @@ router.get("/:type", async (req, res) => {
         ],
       })
         .limit(parseInt(req.query.limit))
-        .skip(parseInt(req.query.skip));
+        .skip(parseInt(req.query.skip))
+        .sort({ uploadTimeSort: -1 });
+
+      // console.log(post);
 
       const postsArrayLength = await ProductInfo.countDocuments({
         $or: [
@@ -49,11 +53,11 @@ router.get("/:type", async (req, res) => {
       });
       let newPosts = post;
 
-      let newPosts2 = newPosts.sort(function (a, b) {
-        return b.uploadTime - a.uploadTime;
-      });
+      // let newPosts2 = newPosts.sort(function (a, b) {
+      //   return b.uploadTimeSort - a.uploadTimeSort;
+      // });
 
-      res.json({ msg: "success", posts: newPosts2, postsArrayLength });
+      res.json({ msg: "success", posts: newPosts, postsArrayLength });
     }
   } catch (error) {
     console.log(error);
@@ -65,7 +69,7 @@ router.get("/:type", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const post = await ProductInfo.find({});
-    console.log("/");
+    // console.log("/");
     let newPosts = post;
 
     let newPosts2 = newPosts.sort(function (a, b) {
@@ -81,7 +85,7 @@ router.get("/", async (req, res) => {
 
 router.get("/:_id", async (req, res) => {
   try {
-    console.log(req.params._id);
+    // console.log(req.params._id);
     const post = await ProductInfo.findById(req.params._id);
 
     res.json({ msg: "success", post });
@@ -92,7 +96,7 @@ router.get("/:_id", async (req, res) => {
 });
 router.post("/w/", auth, fileUpload.array("images", 4), async (req, res) => {
   try {
-    console.log(req.files);
+    // console.log(req.files);
     res.json({
       ...req.body,
       ...req.files,
@@ -111,10 +115,11 @@ router.post("/", auth, fileUpload.array("images", 4), async (req, res) => {
     for (let i = 0; i < req.files.length; i++) {
       imageLink.push({
         id: new Date().getTime(),
-        img: `${baseUrl}${req.files[i].path}`,
-        org: req.files[i].path,
+        img: `${baseUrl}imageStream/${req.files[i].id}`,
+        org: req.files[i].id,
       });
     }
+    // console.log(req.files);
 
     const productData = {
       name: req.body.name,
@@ -127,6 +132,7 @@ router.post("/", auth, fileUpload.array("images", 4), async (req, res) => {
       uploaderId: req.body.uploaderId,
 
       uploadTime: new Date().toDateString(),
+      uploadTimeSort: new Date(),
     };
     const post = await ProductInfo.create({ ...productData });
     res.json({
@@ -170,16 +176,17 @@ router.patch("/:id", auth, fileUpload.array("images", 4), async (req, res) => {
 router.delete("/:id", auth, async (req, res) => {
   try {
     const { id } = await req.params;
-    console.log(id);
+    // console.log(id);
     const deletedPost = await ProductInfo.findByIdAndDelete(id);
 
-    console.log(deletedPost);
+    // console.log(deletedPost);
 
     for (let i = 0; i < deletedPost.images.length; i++) {
-      await fs.unlink(deletedPost.images[i].org, function (err) {
-        if (err) throw err;
-        console.log("File deleted!");
-      });
+      // await fs.unlink(deletedPost.images[i].org, function (err) {
+      //   if (err) throw err;
+      //   console.log("File deleted!");
+      // });
+      await deleteImage(deletedPost.images[i].org);
     }
 
     res.json({ deletedPost, msg: "File Deleted Successfully" });

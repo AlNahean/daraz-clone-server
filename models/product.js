@@ -20,5 +20,6 @@ const PostInfo = new mongoose.Schema({
   uploader: String,
   uploaderId: String,
   uploadTime: String,
+  uploadTimeSort: Number,
 });
 module.exports = mongoose.model("PostInfoV1", PostInfo);

@@ -25,12 +25,14 @@ router.patch("/:id", auth, fileUpload.single("image"), async (req, res) => {
     );
     const updatedUser = await UserInfo.findByIdAndUpdate(
       id,
-      { img: `${baseUrl}imageStream/${req.file.path}`, org: req.file.id },
+      { img: `${baseUrl}imageStream/${req.file.id}`, org: req.file.id },
       {
         new: true,
         runValidators: true,
       }
     );
+
+    // console.log("dfkjsdbfjhdbfgkjlsbkj", req.file);
 
     await deleteImage(userInfoCached.org);
 

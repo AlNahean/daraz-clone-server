@@ -138,7 +138,7 @@ imageStream.get("/:id", async ({ params: { id } }, res) => {
     // search for the image by id
     await gfs.find({ _id }).toArray((err, files) => {
       if (!files || files.length === 0) {
-        console.log(err, files);
+        // console.log(err, files);
         return res.status(400).send("no files exist");
       }
       // if a file exists, send the data

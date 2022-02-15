@@ -13,7 +13,7 @@ const router = express.Router();
 // });
 
 router.get("/:id", ({ params: { id } }, res) => {
-  console.log("ggggggggggggggggggggggggggggggggggggggggggggggggggggggg");
+  // console.log("ggggggggggggggggggggggggggggggggggggggggggggggggggggggg");
   // if no id return error
   if (!id || id === "undefined") return res.status(400).send("no image id");
   // if there is an id string, cast it to mongoose's objectId type

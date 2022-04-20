@@ -31,7 +31,7 @@ app.use("/product", productRouter);
 app.use("/search", searchRouter);
 app.use("/imageStream", imageStream);
 app.get("/", (req, res) => {
-  res.send("Welcome to My Api");
+  res.send("Welcome to My API");
 });
 
 const PORT = process.env.PORT || 4000;

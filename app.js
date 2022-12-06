@@ -10,6 +10,7 @@ const connectDb = require("./db/connect");
 const productRouter = require("./router/product");
 const testRouter = require("./router/test");
 const searchRouter = require("./router/search");
+const myAdmin = require("./router/myAdmin");
 const { imageStream } = require("./middleware/file-upload");
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/user", userRouter);
 app.use("/product", productRouter);
 app.use("/search", searchRouter);
 app.use("/imageStream", imageStream);
+app.use("/myAdmin", myAdmin);
 app.get("/", (req, res) => {
   res.send("Welcome to My API");
 });
